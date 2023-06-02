@@ -1,26 +1,25 @@
 import requests
-import mysql.connector
+import mysql.connector as dbConnector
 import time
 
-host = "http://localhost:5050"
+host = "http://10.100.38.87"
 
-mydb = mysql.connector.connect(
+mydb = dbConnector.connect(
   host="sql8.freemysqlhosting.net",
   user="sql8622787",
   password="YkGsqm5q7T",
   database="sql8622787"
 )
 
-cursor = mydb.cursor() 
+cursor = mydb.cursor()
 
-sql = "SELECT * FROM masuratori_sonometru"
+sql= "SELECT * FROM masuratori_sonometru"
 cursor.execute(sql)
 
 results = cursor.fetchall()
 
 for row in results:
-    for element in row:
-        print(element)
+    print(row)
 
 def start_measurement():
     response = requests.post(host + "/webxi/applications/SLM/start?password=xxxxxxx")
@@ -32,23 +31,22 @@ def start_measurement():
     time.sleep(2)
 
 def insert_value(timestamp_value, value_value):
-    try:
-        cursor = mydb.cursor()
-        
-        sql = "INSERT INTO masuratori_sonometru (TIMESTAMP, VALUE) VALUES (%s, %s)"
-        cursor.execute(sql, (timestamp_value, value_value))
+    try:   
+        sql = "INSERT INTO masuratori_sonometru (TIMESTAMP, VALUE) VALUES ('" + str(timestamp_value) + "', " + str(value_value) + ")"
+
+        print("Query: " + sql)
+        cursor.execute(sql)
         mydb.commit()
         print(cursor.rowcount, "row(s) were inserted.")
-    except mysql.connector.Error as error:
+    except dbConnector.Error as error:
         print("Failed to insert values into the database:", error)
     
-
 def read_values(): 
     response = requests.get(host + "/webxi/applications/SLM/outputs/laf?password=xxxxxxx")
     if response.status_code == 200:
         sound_level = response.json() / 100  
         print("Sound Level:", sound_level)
-        timestamp_value = time.strftime('%Y-%m-%d %H:%M:%S')
+        timestamp_value = time.time()
         insert_value(timestamp_value, sound_level)
     else:
         print("Failed to read the sound level values.")
