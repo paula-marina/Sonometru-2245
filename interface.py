@@ -7,10 +7,10 @@ from  tkinter import ttk
 host = "http://10.100.38.87"
 
 mydb = dbConnector.connect(
-  host="sql8.freemysqlhosting.net",
-  user="sql8622787",
-  password="YkGsqm5q7T",
-  database="sql8622787"
+  host="sql7.freemysqlhosting.net",
+  user="sql7626247",
+  password="6jCzkFRkCS",
+  database="sql7626247"
 )
 
 cursor = mydb.cursor()
